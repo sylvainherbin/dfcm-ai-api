@@ -1,0 +1,12 @@
+{
+  "name": "dfcm-ai-api",
+  "version": "1.0.0",
+  "description": "Vercel Serverless Function for DFCM AI Assistant",
+  "main": "api/chatbot.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.1.0"
+  }
+}
