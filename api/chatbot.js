@@ -1,45 +1,44 @@
-// api/chatbot.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(request, response) {
-  if (request.method !== 'POST') {
-    return response.status(405).json({ error: 'Method Not Allowed', message: 'Only POST requests are accepted.' });
+export default async function (request, response) {
+  // Gérer la requête OPTIONS (pré-vol CORS)
+  if (request.method === 'OPTIONS') {
+    response.setHeader('Access-Control-Allow-Origin', '*'); // Autorise toutes les origines
+    response.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); // Autorise les méthodes POST, GET, OPTIONS
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Autorise l'en-tête Content-Type, nécessaire pour JSON
+    response.status(204).end(); // Réponse 204 No Content pour un pré-vol OPTIONS réussi
+    return;
   }
 
-  const { message } = request.body;
+  // Configurer les en-têtes CORS pour les requêtes réelles (POST, GET)
+  response.setHeader('Access-Control-Allow-Origin', '*'); // Autorise toutes les origines pour les requêtes suivantes
+  response.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); // Double vérification des méthodes autorisées
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Double vérification des en-têtes autorisés
+  response.setHeader('Vary', 'Origin'); // Indique au navigateur que la réponse peut varier selon l'origine
 
+  const message = request.body.message;
+
+  // Vérifier si le message est présent
   if (!message) {
-    return response.status(400).json({ error: 'Bad Request', message: 'Missing message in request body.' });
+    response.status(400).json({ error: 'Message is required' });
+    return;
   }
 
-  // Ensure API key is set as an environment variable in Vercel
-  const API_KEY = process.env.GEMINI_API_KEY;
-
-  if (!API_KEY) {
-    console.error("GEMINI_API_KEY is not set as an environment variable.");
-    return response.status(500).json({ error: 'Internal Server Error', message: 'AI service not configured. Please contact the site administrator.' });
-  }
+  // Initialiser l'API Gemini
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   try {
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    // Use a suitable model, e.g., 'gemini-1.5-flash' for cost-effectiveness and speed
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Générer le contenu avec Gemini
+    const result = await model.generateContent(message);
+    const geminiResponse = await result.response;
+    const text = geminiResponse.text();
 
-    const prompt = `You are a helpful AI assistant specialized in the Dynamic Fractal Cosmological Model (DFCM). Your purpose is to explain and clarify concepts related to DFCM, resolving cosmological tensions (Hubble tension, Lithium-7 problem, LSS tensions) and its testable predictions. Be concise, informative, and always base your answers on the principles of the DFCM as described on the phi-z.space website. If a question is outside the scope of DFCM or general cosmology, politely state that you cannot answer.
-
-    Here is the user's question: ${message}`;
-
-    const result = await model.generateContent(prompt);
-    const textResponse = result.response.text();
-
-    response.status(200).json({ reply: textResponse });
-
+    // Renvoyer la réponse de l'IA
+    response.status(200).json({ reply: text });
   } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    if (error.response && error.response.status) {
-        console.error('Gemini API Error Status:', error.response.status);
-        console.error('Gemini API Error Data:', await error.response.json());
-    }
-    response.status(500).json({ error: 'Internal Server Error', message: 'Failed to get a response from the AI. Please try again later.' });
+    // Gérer les erreurs de l'API Gemini
+    console.error("Gemini API error:", error);
+    response.status(500).json({ error: 'Failed to get response from Gemini API', details: error.message });
   }
 }
