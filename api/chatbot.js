@@ -214,7 +214,29 @@ export default async function (request, response) {
                     "• CMB Angular Scale (θ*): The model accurately predicts the angular size of the sound horizon at decoupling, showing excellent agreement with Planck observations.\n" +
                     "This high level of multi-probe consistency suggests that the chosen form of φ(z), including its characteristic bumps, is not just a statistical artifact but genuinely captures underlying cosmic dynamics required to reconcile various observational constraints.\n" +
                     "**Conclusion and Future Exploration:** The “bumps” in φ(z) are far more than phenomenological adjustments; they are physically motivated features representing the imprints of Baryon Acoustic Oscillations on the dynamic fractal dimension. Their strategic placement at specific redshifts, coupled with their role in achieving multi-probe consistency, solidifies their physical basis. Crucially, these features enable the model to make testable predictions, such as the deficit in galaxy cluster abundance and the explanation for the CMB low-ℓ anomaly. As these predictions are further tested by next-generation astronomical surveys, the physical justification of these “bumps” and, by extension, the dynamic fractal dimension model itself, will become even more robust. Future work will aim to integrate this dynamic fractal dark energy module into sophisticated cosmological codes like CLASS, enabling even more precise predictions and detailed comparisons with observations, potentially unveiling the deeper microphysical origins of these cosmic imprints."
-                    }
+                    },
+                  // Ajoutez ce segment après le SEGMENT 10, par exemple.
+// Assurez-vous qu'il soit bien intégré dans le tableau `parts` de l'historique utilisateur.
+
+                {text: "**Future of the Universe: Fate of the Cosmos**\n" +
+                "The ultimate fate of the Universe within the dynamic fractal cosmological model is primarily determined by the behavior of dark energy, characterized by its equation of state parameter, w. Different values of w lead to distinct end scenarios:\n" +
+                "• Big Freeze (Heat Death): If w = -1 (cosmological constant) or w > -1 (quintessence), the expansion accelerates indefinitely, but without reaching an infinite rate in finite time. The Universe becomes cold, dark, and empty.\n" +
+                "• Big Rip: If w < -1 (phantom energy), the acceleration of expansion becomes so extreme that the dark energy density increases over time. This leads to the progressive “ripping apart” of structures: galaxy clusters, galaxies, stellar systems, planets, and eventually atoms themselves are torn apart by the accelerating expansion.\n" +
+                "**Key Indicator: The Modified Friedmann Equation**\n" +
+                "The most fundamental equation in this model describing the Universe’s expansion is the modified Friedmann equation:\n" +
+                "H²(z) = H₀²[Ω_m(1+z)^(3φ(z)) + Ω_Λ(1+z)^(3(2-φ(z)))]\n" +
+                "This equation directly implies the scaling of dark energy density ρ_Λ(z) ∝ (1+z)^(3(2-φ(z))).\n" +
+                "To predict the future, we examine the behavior as time approaches infinity, which corresponds to redshift z → -1.\n" +
+                "• Future Evolution of φ(z): The function φ(z) is dominated by the exponential term e^(-Γz) for long-term evolution. As z becomes negative (approaching -1), this exponential term increases significantly:\n" +
+                "z → -1 ⇒ e^(-Γz) → e^Γ\n" +
+                "With Γ = 0.433, the future value of φ will converge to a constant value higher than its current value.\n" +
+                "• Dark Energy Exponent and Phantom Energy:\n" +
+                "The dark energy density ρ_Λ is proportional to the term (1+z)^(3(2-φ(z))). Since the scale factor a = 1/(1+z), we can rewrite this as:\n" +
+                "ρ_Λ(a) ∝ a^(-3(2-φ(a))) = a^(3(φ(a)-2))\n" +
+                "Because φ is and will remain greater than 2 in the future, the exponent 3(φ(a)-2) is positive. This implies that the dark energy density increases as the Universe expands (a → ∞). This behavior is the very definition of phantom energy, characterized by an equation of state w < -1. The model’s dark energy equation of state, w_Λ(z) = 1 - φ(z), is consistent with this behavior, as φ(z) > 2 implies w_Λ(z) < -1. Consequently, based on the modified Friedmann equation, this model unequivocally predicts a Big Rip.\n" +
+                "This prediction is a direct and powerful consequence of the evolution of the fractal dimension φ(z) into the future, linking the dynamic fractal geometry of spacetime to the ultimate destiny of the cosmos."
+                }
+
                 ],
             },
             {
