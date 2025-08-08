@@ -2,6 +2,7 @@
   "name": "dfcm-ai-api",
   "version": "1.0.0",
   "description": "Vercel Serverless Function for DFCM AI Assistant",
+  "type": "module",
   "main": "api/chatbot.js",
   "scripts": {
     "start": "vercel dev"
