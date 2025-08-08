@@ -22,9 +22,11 @@ print(f"SciPy Version: {scipy.__version__}")
 print("-" * 38 + "\n")
 
 # --- 1. Model Definition ---
+# --- CORRECTION APPLIQUÉE ICI ---
+PHI = (1 + np.sqrt(5)) / 2
 def phi_z(z, Gamma, A1, A2):
     """Calculates the dynamic fractal dimension phi(z)."""
-    phi_inf = 1.618  # Updated to Golden Ratio
+    phi_inf = PHI
     phi_0 = 2.85
     base = phi_inf + (phi_0 - phi_inf) * np.exp(-Gamma * z)
     bao_correction1 = A1 * np.exp(-0.5 * ((z - 0.4)/0.3)**2)
