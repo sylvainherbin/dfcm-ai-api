@@ -22,8 +22,11 @@ print(f"SciPy Version: {scipy.__version__}")
 print("-" * 38 + "\n")
 
 # --- 1. Model Definitions ---
+# --- CORRECTION APPLIQUÉE ICI ---
+PHI = (1 + np.sqrt(5)) / 2
+
 def phi_z(z, Gamma, A1, A2):
-    phi_inf = 1.618  # Updated to Golden Ratio
+    phi_inf = PHI
     phi_0 = 2.85
     base = phi_inf + (phi_0 - phi_inf) * np.exp(-Gamma * z)
     bao_bump_1 = A1 * np.exp(-0.5 * ((z - 0.4)/0.3)**2)
@@ -54,7 +57,7 @@ def D_V_model(redshift, H0, Om, Gamma, A1, A2):
 def rd_model(Gamma, A1, A2, z_drag=1060.0):
     phi_at_drag = phi_z(z_drag, Gamma, A1, A2)
     rs_LambdaCDM_fiducial = 147.0
-    phi_inf_value = 1.618 # Updated
+    phi_inf_value = PHI # CORRECTION APPLIQUÉE ICI
     return rs_LambdaCDM_fiducial * (phi_at_drag / phi_inf_value)**(-0.75)
 
 # --- 2. Data and GLOBAL Optimized Parameters ---
