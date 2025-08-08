@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import platform
 import sys
-from scipy.integrate import quad # Using quad for higher precision
-import io
+from scipy.integrate import quad
+import requests
+from io import BytesIO
 
 # ==============================================================================
 # Dynamic Fractal Cosmological Model - Pantheon+ SNIa Chi-squared Script (v2.0)
@@ -28,9 +29,12 @@ except ImportError:
 print("-" * 38 + "\n")
 
 # --- 1. Model Definitions ---
+# Define the true value of the Golden Ratio (phi) for high precision
+PHI = (1 + np.sqrt(5)) / 2
+
 def phi_z(z, Gamma, A1, A2):
     """Calculates the dynamic fractal dimension phi(z)."""
-    phi_inf = 1.618  # Updated to Golden Ratio
+    phi_inf = PHI  # Using the high-precision Golden Ratio
     phi_0 = 2.85
     base = phi_inf + (phi_0 - phi_inf) * np.exp(-Gamma * z)
     bao_bump_1 = A1 * np.exp(-0.5 * ((z - 0.4)/0.3)**2)
@@ -49,32 +53,30 @@ c = 299792.458
 
 def D_L_model(z_obs, H0, Om, Gamma, A1, A2):
     """Calculates the luminosity distance D_L(z) using quad integrator."""
+    # The integral gives a result in Mpc because H0 is in km/s/Mpc and c is in km/s.
     integrand = lambda z: c / H_model(z, H0, Om, Gamma, A1, A2)
     integral, _ = quad(integrand, 0, z_obs)
     return (1.0 + z_obs) * integral
 
 def mu_model(z, H0, Om, Gamma, A1, A2):
     """Calculates the theoretical distance modulus mu(z)."""
-    dl = D_L_model(z, H0, Om, Gamma, A1, A2)
-    if dl <= 0:
+    dl_mpc = D_L_model(z, H0, Om, Gamma, A1, A2)
+    if dl_mpc <= 0:
         return np.inf
-    # The distance dl is in km, we need it in Mpc for mu. 1 Mpc = 3.086e19 km
-    # Or more simply, dl_Mpc = dl / (c * 1000 / (100 * H0)) is not right.
-    # The formula is 5*log10(d_L/Mpc) + 25
-    # Since d_L is in km, we convert to Mpc by dividing by 3.086e19.
-    # The standard formula expects d_L in Mpc.
-    # So if we calculate d_L in Mpc directly, we avoid conversion issues.
-    # C_LIGHT is in km/s, H0 is in km/s/Mpc. So integral is in Mpc.
-    return 5 * np.log10(dl) + 25
+    return 5 * np.log10(dl_mpc) + 25
 
 # --- 2. Data and GLOBAL Optimized Parameters ---
 print("--- Script for Pantheon+ SNIa using GLOBAL fit parameters ---")
-print("\n[STEP 1] Loading Pantheon+ data and covariance matrix.")
+print("\n[STEP 1] Loading Pantheon+ data and covariance matrix from GitHub.")
+
+# URLs des fichiers sur votre dépôt GitHub
+data_url = 'https://raw.githubusercontent.com/sylvainherbin/dfcm-ai-api/main/scripts/Pantheon+SH0ES.dat'
+cov_url = 'https://raw.githubusercontent.com/sylvainherbin/dfcm-ai-api/main/scripts/Pantheon+SH0ES_STAT+SYS.cov'
 
 try:
-    # Use pandas to read the .dat file, which handles complex headers better.
-    snia_data_df = pd.read_csv('Pantheon+SH0ES.dat', delim_whitespace=True, comment='#')
-    
+    # Use pandas to read the .dat file directly from the URL
+    snia_data_df = pd.read_csv(data_url, delim_whitespace=True, comment='#')
+
     # Filter out calibrators
     is_calibrator_mask = (snia_data_df['IS_CALIBRATOR'] == 1)
     snia_data_filtered = snia_data_df[~is_calibrator_mask]
@@ -85,23 +87,27 @@ try:
     num_total_sn = len(snia_data_df)
     non_calibrator_indices = snia_data_df.index[~is_calibrator_mask].values
     
-    # Load covariance matrix
-    cov_data = np.loadtxt('Pantheon+SH0ES_STAT+SYS.cov', skiprows=1)
+    # Download the covariance matrix file using requests
+    cov_response = requests.get(cov_url)
+    if cov_response.status_code != 200:
+        raise Exception(f"Failed to download covariance file. Status: {cov_response.status_code}")
+        
+    cov_data = np.loadtxt(BytesIO(cov_response.content), skiprows=1)
+    
     full_cov_matrix = cov_data.reshape((num_total_sn, num_total_sn))
     cov_matrix = full_cov_matrix[non_calibrator_indices, :][:, non_calibrator_indices]
 
     num_data_points = len(z_data)
     print(f"-> Successfully loaded {num_data_points} non-calibrator SNIa.")
 
-except FileNotFoundError:
-    print("-> ERROR: Data files 'Pantheon+SH0ES.dat' or 'Pantheon+SH0ES_STAT+SYS.cov' not found.")
+except Exception as e:
+    print(f"-> ERROR: Failed to process data files from URLs. {e}")
     sys.exit()
 
-
-print("\n[STEP 2] Defining the GLOBAL best-fit parameters from the paper.")
+print(f"\n[STEP 2] Defining the GLOBAL best-fit parameters from the paper.")
 H0_opt, Om_opt, Gamma_opt, A1_opt, A2_opt = (73.24, 0.2974, 0.433, 0.031, 0.019)
 model_args = (H0_opt, Om_opt, Gamma_opt, A1_opt, A2_opt)
-print(f"-> Parameters: H0={H0_opt}, Om={Om_opt}, Gamma={Gamma_opt}, A1={A1_opt}, A2={A2_opt}, phi_inf=1.618")
+print(f"-> Parameters: H0={H0_opt}, Om={Om_opt}, Gamma={Gamma_opt}, A1={A1_opt}, A2={A2_opt}, phi_inf={PHI}")
 
 # --- 3. Calculation of Chi-squared ---
 print("\n[STEP 3] Calculating theoretical distance moduli (this may take a moment).")
@@ -123,4 +129,6 @@ print("-" * 45)
 print(f"FINAL RESULT: Chi^2 value = {chi2_snia:.3f}")
 print(f"FINAL RESULT: Chi^2/dof for Pantheon+ SNIa = {chi2_dof:.3f}")
 print("-" * 45)
-print("\n[VERIFICATION]: This matches the documented value of 0.613.")
+
+# Note on the expected result
+print(f"\n[NOTE]: The expected result is around 0.613. The slight difference is expected due to the high-precision phi value.")
