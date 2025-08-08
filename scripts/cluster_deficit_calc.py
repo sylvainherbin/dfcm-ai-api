@@ -22,9 +22,12 @@ print(f"SciPy Version: {scipy.__version__}")
 print("-" * 38 + "\n")
 
 # --- 1. Model Definitions ---
+# --- CORRECTION APPLIQUÉE ICI ---
+PHI = (1 + np.sqrt(5)) / 2
+
 def phi_z(z, Gamma, A1, A2):
     """Calculates the dynamic fractal dimension phi(z)."""
-    phi_inf = 1.618  # Updated to Golden Ratio
+    phi_inf = PHI
     phi_0 = 2.85
     base = phi_inf + (phi_0 - phi_inf) * np.exp(-Gamma * z)
     bao_correction1 = A1 * np.exp(-0.5 * ((z - 0.4)/0.3)**2)
@@ -82,7 +85,7 @@ else:
     # This formula is a simplified proxy. The paper uses a more direct method.
     # We will use the direct method from the global script for consistency.
     phi_at_cluster_era = phi_z(z_comparison, Gamma_opt, A1_opt, A2_opt)
-    phi_inf = 1.618
+    phi_inf = PHI # CORRECTION APPLIQUÉE ICI
     deficit_percentage = 100 * (1 - (phi_at_cluster_era / phi_inf)**0.5)
 
 
@@ -97,4 +100,3 @@ print("\n[VERIFICATION]:")
 print(f"-> The documented Chi^2/dof for this probe is 1.228.")
 print("-> This script confirms the model's key prediction of a significant")
 print("   deficit in massive clusters, consistent with the documented results.")
-
