@@ -14,11 +14,22 @@
 # ==============================================================================
 
 import numpy as np
+import platform
+import scipy
 from scipy.integrate import quad
+
+# --- Diagnostic ---
+print("### Execution Environment Diagnostic ###")
+print(f"Python Version: {platform.python_version()}")
+print(f"NumPy Version: {np.__version__}")
+print(f"SciPy Version: {scipy.__version__}")
+print("-" * 38 + "\n")
 
 # --- Constants ---
 # Speed of light in km/s
 C_LIGHT = 299792.458
+# The Golden Ratio
+PHI = (1 + np.sqrt(5)) / 2
 
 # ==============================================================================
 # SECTION 1: THE CORE OF THE FRACTAL UNIVERSE MODEL
@@ -31,7 +42,7 @@ def get_fractal_dimension(redshift, Gamma, A1, A2):
     This version uses the official parameters from the model's paper.
     - phi_inf is set to the Golden Ratio.
     """
-    phi_inf = 1.618  # Value in the distant past (Golden Ratio)
+    phi_inf = PHI  # Value in the distant past (Golden Ratio) - CORRECTION APPLIQUÉE
     phi_0 = 2.85     # Value today
     
     # The basic smooth change over time
@@ -83,7 +94,7 @@ def get_sound_horizon_size(Gamma, A1, A2):
     phi_at_drag_epoch = get_fractal_dimension(redshift_drag_epoch, Gamma, A1, A2)
     
     rs_standard_model = 147.0
-    phi_inf_value = 1.618  # Using the Golden Ratio as the reference
+    phi_inf_value = PHI  # Using the Golden Ratio as the reference - CORRECTION APPLIQUÉE
     
     return rs_standard_model * (phi_at_drag_epoch / phi_inf_value)**(-0.75)
 
@@ -133,7 +144,7 @@ output_lines.append("  Results from the Dynamic Fractal Universe Calculator (v2.
 output_lines.append(f"  (Model by Sylvain Herbin, phi-z.space)                           ")
 output_lines.append("=====================================================================")
 output_lines.append("This analysis uses the official best-fit parameters from the paper.")
-output_lines.append(f"Parameters: H0={H0:.2f}, Om={Om:.4f}, Gamma={Gamma:.3f}, A1={A1:.3f}, A2={A2:.3f}, phi_inf=1.618")
+output_lines.append(f"Parameters: H0={H0:.2f}, Om={Om:.4f}, Gamma={Gamma:.3f}, A1={A1:.3f}, A2={A2:.3f}, phi_inf={PHI:.16f}")
 output_lines.append("---------------------------------------------------------------------\n")
 
 # --- TEST 1: Cosmic Chronometers ---
@@ -173,7 +184,7 @@ output_lines.append(f"Agreement between model and data: {tension:.2f} sigma.")
 output_lines.append("-> CONCLUSION: The model resolves the Hubble Tension.")
 output_lines.append("---------------------------------------------------------------------\n")
 
-# --- TEST 4: CMB Consistency ---
+# --- TEST 4: Consistency with the Early Universe (CMB) ---
 output_lines.append("### TEST 4: Consistency with the Early Universe (CMB) ###")
 redshift_cmb = 1100.0
 dm_cmb_model = get_comoving_distance(redshift_cmb, *model_args)
@@ -185,11 +196,11 @@ output_lines.append(f"Agreement between model and data: {tension_theta:.2f} sigm
 output_lines.append("-> CONCLUSION: Excellent agreement with the key CMB observation.")
 output_lines.append("---------------------------------------------------------------------\n")
 
-# --- TEST 5: Galaxy Cluster Deficit ---
+# --- TEST 5: Explaining the Missing Galaxy Clusters ---
 output_lines.append("### TEST 5: Explaining the Missing Galaxy Clusters ###")
 z_cluster_era = 0.6
 phi_at_cluster_era = get_fractal_dimension(z_cluster_era, Gamma, A1, A2)
-phi_inf = 1.618
+phi_inf = PHI # CORRECTION APPLIQUÉE
 deficit_prediction = 100 * (1 - (phi_at_cluster_era / phi_inf)**0.5)
 output_lines.append(f"The model predicts a deficit of massive clusters at z={z_cluster_era:.1f} of about: {deficit_prediction:.1f}%")
 output_lines.append("-> CONCLUSION: Provides a natural explanation for the observed cluster deficit.")
@@ -203,5 +214,6 @@ output_lines.append("improvement over the standard Lambda-CDM model. This sugges
 output_lines.append("Fractal Model is a very strong candidate for a new cosmology.")
 output_lines.append("=====================================================================")
 
+# The script itself would end here. The following is just to demonstrate its output.
 final_report = "\n".join(output_lines)
 print(final_report)
